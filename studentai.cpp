@@ -23,7 +23,6 @@ void microMouseServer::studentAI()
 */
 
 
-
     /* Follows the wall on the left side of the mouse around the maze */
 
     if(!isWallLeft()){
