@@ -21,4 +21,21 @@ void microMouseServer::studentAI()
  * void foundFinish();
  * void printUI(const char *mesg);
 */
+
+
+
+    /* Follows the wall on the left side of the mouse around the maze */
+
+    if(!isWallLeft()){
+        turnLeft();
+        moveForward();
+    }
+
+    else if(!isWallForward()){
+        moveForward();
+    }
+    else {
+        turnRight();
+
+    }
 }
