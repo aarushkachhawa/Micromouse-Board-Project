@@ -1,5 +1,10 @@
 
 #include "micromouseserver.h"
+#include <string>
+
+using namespace std;
+
+string path = "";
 
 void microMouseServer::studentAI()
 {
@@ -22,19 +27,23 @@ void microMouseServer::studentAI()
  * void printUI(const char *mesg);
 */
 
+    // Follows the wall on the left side of the mouse around the maze
 
-    /* Follows the wall on the left side of the mouse around the maze */
-
-    if(!isWallLeft()){
+    if(path.length()>=7 && path.substr(path.length()-7)=="FRFRFRF"){
+        foundFinish();
+    }
+    else if(!isWallLeft()){
         turnLeft();
         moveForward();
+        path += "LF";
     }
 
     else if(!isWallForward()){
         moveForward();
+        path += "F";
     }
     else {
         turnRight();
-
+        path += "R";
     }
 }
