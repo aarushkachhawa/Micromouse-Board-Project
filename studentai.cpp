@@ -1,5 +1,16 @@
 
 #include "micromouseserver.h"
+#include <string>
+#include <stack>
+
+using namespace std;
+
+string path = "";
+string lastPath = "";
+string differenceOfPaths = "";
+string mode = "discover";
+bool inReverse = false;
+stack<string> pathStack;
 
 void microMouseServer::studentAI()
 {
@@ -21,4 +32,53 @@ void microMouseServer::studentAI()
  * void foundFinish();
  * void printUI(const char *mesg);
 */
+
+    if(path.length()>=7 && path.substr(path.length()-7)=="FRFRFRF"){
+            foundFinish();
+        }
+    else if(mode=="discover"){
+        if(!(isWallLeft() && isWallRight() && isWallForward())){
+            lastPath = pathStack.top();
+            mode = "backtrack";
+            backtrack();
+        }
+    }
+    else {
+        backtrack();
+    }
+}
+
+
+void microMouseServer::backtrack(){
+    if(inReverse){
+        char newPath = lastPath[lastPath.length()-1];
+        //string pathCopy = path.substr(0);
+        for(int i=path.length()-1; i>=lastPath.length()-1; i--){
+            differenceOfPaths += path[i];
+        }
+        if(differenceOfPaths.length()==0){
+            //move in direction of newPath
+            mode = "discover";
+        }
+        else if(differenceOfPaths[0]=='F'){
+            moveForward();
+            path = path.substr(0, path.length()-1);
+        }
+        else if(differenceOfPaths[0]=='R'){
+            turnLeft();
+            moveForward();
+            path = path.substr(0, path.length()-1);
+        }
+        else{
+            turnRight();
+            moveForward();
+            path = path.substr(0, path.length()-1);
+        }
+    }
+    else {
+        turnLeft();
+        turnLeft();
+        inReverse = true;
+    }
+
 }

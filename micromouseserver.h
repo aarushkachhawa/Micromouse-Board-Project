@@ -53,6 +53,7 @@ private:
     void turnRight();
     void foundFinish();
     void printUI(const char *mesg);
+    void backtrack();
 
     QTimer *_comTimer;
     QTimer *_aiCallTimer;
