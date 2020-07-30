@@ -2,15 +2,20 @@
 #include "micromouseserver.h"
 #include <string>
 #include <stack>
+#include <set>
+#include <tuple>
 
 using namespace std;
 
+int direction {0};
 string path = "";
 string lastPath = "";
-string differenceOfPaths = "";
+//string differenceOfPaths = "";
 string mode = "discover";
 bool inReverse = false;
-stack<string> pathStack;
+stack <string> pathStack;
+tuple <int, int> Coordinate = make_tuple(0, 0);
+set <tuple<int, int>> visitedCoordinates;
 
 void microMouseServer::studentAI()
 {
@@ -32,53 +37,151 @@ void microMouseServer::studentAI()
  * void foundFinish();
  * void printUI(const char *mesg);
 */
-
-    if(path.length()>=7 && path.substr(path.length()-7)=="FRFRFRF"){
+    if(direction==-1) printUI("direction=-1");
+    if(path.length()>=4 && path.substr(path.length()-4)=="FRRR"){
             foundFinish();
         }
     else if(mode=="discover"){
-        if(!(isWallLeft() && isWallRight() && isWallForward())){
+        printUI("discover");
+        if((isWallLeft() && isWallRight() && isWallForward()) || visitedCoordinates.count(Coordinate)==1){
+            if(visitedCoordinates.count(Coordinate)==1) printUI("Auto Backtrack");
             lastPath = pathStack.top();
+            pathStack.pop();
             mode = "backtrack";
             backtrack();
         }
+        else findNeighbors();
     }
-    else {
-        backtrack();
+    else backtrack();
+}
+
+void microMouseServer::move(char letter){
+    if(letter=='F') {
+        moveForward();
+        path += "F";
+        visitedCoordinates.insert(Coordinate);
+        updateCoordinate();
+    }
+    else if(letter=='R') {
+        turnRight();
+        moveForward();
+        path += "R";
+        direction += 1;
+        visitedCoordinates.insert(Coordinate);
+        updateCoordinate();
+    }
+    else if (letter=='L'){
+        turnLeft();
+        moveForward();
+        path += "L";
+        direction -= 1;
+        visitedCoordinates.insert(Coordinate);
+        updateCoordinate();
     }
 }
 
 
 void microMouseServer::backtrack(){
+    printUI(path.c_str());
+    printUI(lastPath.c_str());
+    string differenceOfPaths = "";
     if(inReverse){
-        char newPath = lastPath[lastPath.length()-1];
-        //string pathCopy = path.substr(0);
-        for(int i=path.length()-1; i>=lastPath.length()-1; i--){
+        for(int i=path.size()-1; i>=(int)lastPath.size()-1; i--){
             differenceOfPaths += path[i];
         }
-        if(differenceOfPaths.length()==0){
-            //move in direction of newPath
+        printUI("backtrack");
+        if(differenceOfPaths.empty()){
+            if(lastPath[lastPath.size()-1]=='F'){
+                turnLeft();
+                turnLeft();
+                if(direction==1 || direction==-1) direction*=-1;
+                else if(direction==0) direction=2;
+                else if(direction==2 || direction==-2) direction=0;
+                else if(direction==3) direction=1;
+                else if(direction==-3) direction=-1;
+                moveForward();
+            } else if(lastPath[lastPath.size()-1]=='L'){
+                turnRight();
+                moveForward();
+                direction += 1;
+            }else if(lastPath[lastPath.size()-1]=='R'){
+                turnLeft();
+                moveForward();
+                direction -= 1;
+            }
+            updateCoordinate();
+            path = lastPath;
             mode = "discover";
+            inReverse = false;
         }
         else if(differenceOfPaths[0]=='F'){
             moveForward();
-            path = path.substr(0, path.length()-1);
+            updateCoordinate();
+            path = path.substr(0, path.size()-1);
         }
         else if(differenceOfPaths[0]=='R'){
-            turnLeft();
             moveForward();
-            path = path.substr(0, path.length()-1);
+            updateCoordinate();
+            turnLeft();
+            direction -= 1;
+            path = path.substr(0, path.size()-1);
         }
         else{
-            turnRight();
             moveForward();
-            path = path.substr(0, path.length()-1);
+            updateCoordinate();
+            turnRight();
+            direction += 1;
+            path = path.substr(0, path.size()-1);
         }
     }
     else {
-        turnLeft();
-        turnLeft();
+        turnRight();
+        turnRight();
+        if(direction==1 || direction==-1) direction*=-1;
+        else if(direction==0) direction=2;
+        else if(direction==2 || direction==-2) direction=0;
+        else if(direction==3) direction=1;
+        else if(direction==-3) direction=-1;
         inReverse = true;
     }
 
 }
+
+void microMouseServer::findNeighbors(){
+    string neighbors;
+    if(!isWallLeft()) neighbors += 'L';
+    if(!isWallForward()) neighbors += 'F';
+    if(!isWallRight()) neighbors += 'R';
+
+
+
+
+
+    printUI(neighbors.c_str());
+    if(neighbors.size()==1){
+        move(neighbors[0]);
+    }
+    else if(neighbors.size()==2 && !path.empty()){
+        pathStack.push((path + neighbors[1]));
+        move(neighbors[0]);
+    }
+    else if(neighbors.size()==3 && !path.empty()) {
+        pathStack.push((path + neighbors[2]));
+        pathStack.push((path + neighbors[1]));
+        move(neighbors[0]);
+    }
+}
+
+void microMouseServer::updateCoordinate(){
+    if(direction == 3) direction = -1;
+    else if(direction == -3) direction = 1;
+    else if(direction == 4 || direction == -4) direction = 0;
+    if(direction == 0) get<1>(Coordinate) += 1;
+    else if(direction == 1) get<0>(Coordinate) += 1;
+    else if(direction == 2) get<1>(Coordinate) -= 1;
+    else if(direction == -1) get<0>(Coordinate) -= 1;
+    else if(direction == -2) get<1>(Coordinate) -= 1;
+
+}
+
+

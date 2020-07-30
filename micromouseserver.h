@@ -54,6 +54,9 @@ private:
     void foundFinish();
     void printUI(const char *mesg);
     void backtrack();
+    void move(char letter);
+    void findNeighbors();
+    void updateCoordinate();
 
     QTimer *_comTimer;
     QTimer *_aiCallTimer;
