@@ -56,7 +56,7 @@ private:
     void backtrack();
     void move(char letter);
     void findNeighbors();
-    void updateCoordinate();
+    void updateCoordinate(); 
 
     QTimer *_comTimer;
     QTimer *_aiCallTimer;
