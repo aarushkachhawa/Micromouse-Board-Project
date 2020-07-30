@@ -35,8 +35,7 @@ void microMouseServer::studentAI()
  * The following functions are called when you need to output something to the UI or when you have finished the maze
  * void foundFinish();
  * void printUI(const char *mesg);
-*/
-
+*/  
     if(path.length()>=4 && path.substr(path.length()-4)=="FRRR"){
             foundFinish();
         }
@@ -52,6 +51,7 @@ void microMouseServer::studentAI()
     else backtrack();
 }
 
+//Moves the mouse and 'marks' where it has been
 void microMouseServer::move(char letter){
     if(letter=='F') {
         moveForward();
@@ -77,6 +77,7 @@ void microMouseServer::move(char letter){
     }
 }
 
+//Moves the mouse from the current position to the latest fork in the maze
 void microMouseServer::backtrack(){
     string differenceOfPaths = "";
     if(inReverse){
@@ -140,6 +141,7 @@ void microMouseServer::backtrack(){
     }
 }
 
+//Remebers the path of the neighbors when at a fork
 void microMouseServer::findNeighbors(){
     string neighbors;
     if(!isWallLeft()) neighbors += 'L';
@@ -159,6 +161,7 @@ void microMouseServer::findNeighbors(){
     }
 }
 
+//Updates the mouse's current coordinate based off of the direction it's facing
 void microMouseServer::updateCoordinate(){
     if(direction == 3) direction = -1;
     else if(direction == -3) direction = 1;
