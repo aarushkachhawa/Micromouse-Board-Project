@@ -55,6 +55,7 @@ private:
     void printUI(const char *mesg);
     void backtrack();
     void findNeighbors();
+    void updateCoordinate();
 
     QTimer *_comTimer;
     QTimer *_aiCallTimer;
