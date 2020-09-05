@@ -12,6 +12,7 @@ string lastPath = "";
 string mode = "discover";
 string pathDifferenceOfPaths = "";
 string lastPathDifferenceOfPaths = "";
+string entirePath = "";
 bool inReverse = false;
 bool backtrackPartTwo = false;
 int counter = {0};
@@ -42,11 +43,30 @@ void microMouseServer::studentAI()
  * void printUI(const char *mesg);
 */
     if(mode=="shortest path"){
-        printUI("hi");
+
+        if(counter==path.size()) foundFinish();
+        else if(path[counter]=='F'){
+            moveForward();
+            counter++;
+
+        } else if(path[counter]=='L'){
+            turnLeft();
+            moveForward();
+            counter++;
+
+        } else if(path[counter]=='R'){
+            turnRight();
+            moveForward();
+            counter++;
+
+        }
+
     }
-    else if(path.size()>=4 && path.substr(path.size()-4)=="FRRR"){
-        foundFinish();
-        //for now
+    else if(entirePath.size()>=7 && entirePath.substr(entirePath.size()-7)=="FRRFLLL"){
+        if(isWallLeft() && isWallRight()){
+            mode = "shortest path";
+            counter = 0;
+        }
     }
     else if(mode=="discover"){
         findNeighbors();
@@ -56,6 +76,14 @@ void microMouseServer::studentAI()
             lastPath = pathQueue.front();
             pathQueue.pop();
         }
+        if(!path.empty()){
+            int i;
+            for(i=0;i<(int)path.size();i++) {
+                if(path[i]!=lastPath[i]) break;
+            }
+            if(i==(int)path.size()) inReverse = true;
+        } else inReverse = true;
+        backtrack();
     }
     else {
         if(!path.empty()){
@@ -82,16 +110,19 @@ void microMouseServer::backtrack(){
             if(lastPath[lastPath.size()-1]=='F'){
                 moveForward();
                 updateCoordinate();
+                entirePath += "F";
             } else if(lastPath[lastPath.size()-1]=='L'){
                 turnLeft();
                 direction -= 1;
                 moveForward();
                 updateCoordinate();
+                entirePath += "L";
             } else if(lastPath[lastPath.size()-1]=='R'){
                 turnRight();
                 direction += 1;
                 moveForward();
                 updateCoordinate();
+                entirePath += "R";
             }
             mode = "discover";
             path = lastPath;
@@ -123,16 +154,19 @@ void microMouseServer::backtrack(){
                     if(lastPathDifferenceOfPaths[0]=='F'){
                         moveForward();
                         updateCoordinate();
+                        entirePath += "F";
                     } else if(lastPathDifferenceOfPaths[0]=='L'){
                         turnLeft();
                         direction -= 1;
                         moveForward();
                         updateCoordinate();
+                        entirePath += "L";
                     } else if(lastPathDifferenceOfPaths[0]=='R'){
                         turnRight();
                         direction += 1;
                         moveForward();
                         updateCoordinate();
+                        entirePath += "R";
                     }
                     counter2++;
                 } else{
@@ -146,6 +180,7 @@ void microMouseServer::backtrack(){
                         else if(direction==-3) direction=-1;
                         moveForward();
                         updateCoordinate();
+                        entirePath += "F";
                         counter2++;
                         backtrackPartTwo = true;
                     } else if(lastPathDifferenceOfPaths[0]=='L'){
@@ -153,12 +188,14 @@ void microMouseServer::backtrack(){
                         direction += 1;
                         moveForward();
                         updateCoordinate();
+                        entirePath += "R";
                         counter2++;
                         backtrackPartTwo = true;
                     } else if(lastPathDifferenceOfPaths[0]=='R'){
                         turnLeft();
                         direction -= 1;
                         moveForward();
+                        entirePath += "L";
                         updateCoordinate();
                         counter2++;
                         backtrackPartTwo = true;
@@ -168,12 +205,14 @@ void microMouseServer::backtrack(){
         else if(pathDifferenceOfPaths[0]=='F'){
             moveForward();
             updateCoordinate();
+            entirePath += "F";
             counter++;
         }
         else if(pathDifferenceOfPaths[0]=='R'){
             moveForward();
             updateCoordinate();
             turnLeft();
+            entirePath += "R";
             direction -= 1;
             counter++;
         }
@@ -181,6 +220,7 @@ void microMouseServer::backtrack(){
             moveForward();
             updateCoordinate();
             turnRight();
+            entirePath += "L";
             direction += 1;
             counter++;
             }
